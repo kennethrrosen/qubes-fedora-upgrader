@@ -21,3 +21,4 @@ For single templates, run the below and you'll be prompted for the desired templ
 ```
 ./fed_upgrade.sh template1 template2 template3
 ```
+A brief final note: I'm not sure `except` is even necessary, but when passing `qvm-run` through dom0 `assumeyes` errored out every time.
