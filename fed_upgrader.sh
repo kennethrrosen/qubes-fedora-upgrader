@@ -76,6 +76,10 @@ if [ $# -gt 0 ]; then
     current_num=$(echo $current_version | grep -oP '(\d+)')
     message "Current version of $template is: Fedora release $current_num ${YELLOW} "
     read -p "Proceed with the upgrade for all templates? (y/n): " proceed
+    if [[ $proceed != "y" ]]; then
+        message "Skipping $template without changes."
+        return 0
+    fi
     read -p "Do you want to clone the templates before upgrading? (y/n): " clone
     if [[ $clone == "y" ]]; then
         read -p "What should be the new template name prefix? " new_template_name_prefix
@@ -94,6 +98,10 @@ else
     current_num=$(echo $current_version | grep -oP '(\d+)')
     message "Current version of $template is: Fedora release $current_num ${YELLOW} "
     read -p "Proceed with the upgrade? (y/n): " proceed
+    if [[ $proceed != "y" ]]; then
+        message "Skipping $template without changes."
+        return 0
+    fi
     read -p "Do you want to clone the template before upgrading? (y/n): " clone
     if [[ $clone == "y" ]]; then
         read -p "What should be the new template name? " new_template_name
