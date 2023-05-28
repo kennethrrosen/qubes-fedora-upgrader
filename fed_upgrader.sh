@@ -56,13 +56,12 @@ upgrade_template() {
         qvm-run -p $new_template_name "sudo dnf update -y && sudo dnf upgrade -y"
         qvm-run -p $new_template_name "cat /etc/fedora-release"
         qvm-shutdown $new_template_name
-        message "Upgrade completed successfully!"
-        message "Upgrade completed successfully!"
         sleep 2
         message "Removing temporary cache..."
-        sleep 2
         sudo losetup -d $dev
         rm -f /var/tmp/template-upgrade-cache.img
+        sleep 2
+        message "Upgrade completed successfully!"
     else
         message "Upgrade failed. Check the template for issues."
         exit 1
