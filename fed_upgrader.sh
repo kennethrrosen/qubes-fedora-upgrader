@@ -41,26 +41,10 @@ upgrade_template() {
         new_template_name=$template
     fi
 
-    message "Running initial DNF upgrade..."
-    qvm-run -p $new_template_name "sudo dnf install expect -y"
-    message "Creating the expect script..."
-
-    qvm-run -p $new_template_name "echo '#!/usr/bin/expect -f
-    set timeout -1
-    spawn sudo dnf --releasever=$new_num distro-sync --best --allowerasing -y
-    expect {
-        -re \"Is this ok \\[y/N\\]:\" {send -- \"y\r\"; exp_continue}
-        -re \"Importing GPG key.*\" {send -- \"y\r\"; exp_continue}
-        eof
-    }' > tmp_expect_script.sh"
-
-    message "Setting execute permissions on the expect script..."
-    qvm-run -p $new_template_name "chmod +x tmp_expect_script.sh"
-
-    message "Running the expect script. Patience..."
-    upgrade_status=$(qvm-run -p $new_template_name "./tmp_expect_script.sh")
-
-    message "Expect script executed. Checking for space errors..."
+    message "Running upgrade..."
+    qvm-run -p $new_template_name "sudo dnf --releasever=$new_num distro-sync --best --allowerasing -y"
+    
+    message "Checking for space errors..."
     if [[ $upgrade_status == *"No space left on device"* ]]; then
         message "Insufficient disk space, creating cache in dom0 and retrying..."
         truncate -s 5GB /var/tmp/template-upgrade-cache.img
@@ -79,9 +63,9 @@ upgrade_template() {
         exit 1
     else
         qvm-run -p $new_template_name "cat /etc/fedora-release"
-        #Presently this script skips trimming as this should no longer be necessary
-        #qvm-run -p $new_template_name "sudo fstrim -av"
-        qvm-run -p $new_template_name "sudo dnf remove expect -y && sudo dnf update -y && sudo dnf upgrade -y"
+        # Presently this script skips trimming as this should no longer be necessary
+        # qvm-run -p $new_template_name "sudo fstrim -av"
+        qvm-run -p $new_template_name "sudo dnf update -y && sudo dnf upgrade -y"
         qvm-shutdown $new_template_name
         message "Upgrade completed successfully!"
     fi
