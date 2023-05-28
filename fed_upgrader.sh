@@ -16,13 +16,13 @@ upgrade_template() {
     local proceed=$2
     local clone=$3
     local new_template_name=$4
-    
+
     vm_exists=$(qvm-ls | grep -w "$template")
     if [[ -z $vm_exists ]]; then
         message "Template $template does not exist."
         exit 1
     fi
-    
+
     current_version=$(qvm-run -p $template "cat /etc/fedora-release")
     current_num=$(echo $current_version | grep -oP '(\d+)')
 
@@ -30,10 +30,10 @@ upgrade_template() {
         message "Skipping $template without changes."
         return 0
     fi
-    
+
     new_num=$((current_num + 1))
     new_release="fedora-$new_num"
-    
+
     if [[ $clone == "y" ]]; then
         qvm-clone $template $new_template_name
     else
@@ -43,13 +43,13 @@ upgrade_template() {
     message "Allocating additional space..."
     truncate -s 5GB /var/tmp/template-upgrade-cache.img
     dev=$(sudo losetup -f --show /var/tmp/template-upgrade-cache.img)
-    
+
     message "Attaching block to $new_template_name"
     qvm-start $new_template_name
     qvm-block attach $new_template_name dom0:${dev##*/}
     qvm-run -p $new_template_name "sudo mkfs.ext4 /dev/xvdi"
     qvm-run -p $new_template_name "sudo mount /dev/xvdi /mnt/removable"
-    
+
     message "Performing upgrade. Patience..."
     if qvm-run -p $new_template_name "sudo dnf clean all && sudo dnf --releasever=$new_num distro-sync --best --allowerasing -y";
     then
