@@ -5,7 +5,7 @@ The script follows the procedure of in-place upgrading for an installed Fedora T
 
 The script begins by asking the user for the name of the template they want to upgrade. Then it checks if that template exists. If it does, the script extracts the current version of the Fedora release from the template and prompts the user if they wish to proceed with the upgrade. If the user agrees, the script then calculates the new version number and asks if the user wants to clone the template before upgrading. The user can choose to clone the template and provide a new name, or proceed with upgrading the original template.
 
-The script then performs an initial upgrade and handles the distro-sync process. Here's the gem: If during the upgrade process, the script encounters a "No space left on device" error, it will automatically create a 5GB cache in dom0 and retry the upgrade.
+The script then performs an initial upgrade and handles the distro-sync process. The script creates a cache block to prevent exiting over a "No space left on device" error.
 
 Finally, after the upgrade is successful, it cleans up the expect package, performs additional updates and upgrades, and shuts down the template. Note: disk drimming is skipped as it should no longer be necessary.
 
