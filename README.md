@@ -15,9 +15,9 @@ To use this script, copy to dom0 (check the script first) and then you've two op
 
 For single templates, run the below and you'll be prompted for the desired template:
 ```
-./fed_upgrade.sh
+./fed_upgrader.sh
 ```
 
 ```
-./fed_upgrade.sh template1 template2 template3
+./fed_upgrader.sh template1 template2 template3
 ```
