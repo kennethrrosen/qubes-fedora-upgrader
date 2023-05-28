@@ -72,6 +72,9 @@ upgrade_template() {
 }
 
 if [ $# -gt 0 ]; then
+    current_version=$(qvm-run -p $template "cat /etc/fedora-release")
+    current_num=$(echo $current_version | grep -oP '(\d+)')
+    message "Current version of $template is: Fedora release $current_num ${YELLOW} "
     read -p "Proceed with the upgrade for all templates? (y/n): " proceed
     read -p "Do you want to clone the templates before upgrading? (y/n): " clone
     if [[ $clone == "y" ]]; then
@@ -87,6 +90,9 @@ if [ $# -gt 0 ]; then
     done
 else
     read -p "What template do you want to upgrade? " template
+    current_version=$(qvm-run -p $template "cat /etc/fedora-release")
+    current_num=$(echo $current_version | grep -oP '(\d+)')
+    message "Current version of $template is: Fedora release $current_num ${YELLOW} "
     read -p "Proceed with the upgrade? (y/n): " proceed
     read -p "Do you want to clone the template before upgrading? (y/n): " clone
     if [[ $clone == "y" ]]; then
