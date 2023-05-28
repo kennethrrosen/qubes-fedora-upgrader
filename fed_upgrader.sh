@@ -41,8 +41,8 @@ upgrade_template() {
         new_template_name=$template
     fi
 
-    message "Running upgrade..."
-    qvm-run -p $new_template_name "sudo dnf --releasever=$new_num distro-sync --best --allowerasing -y"
+    message "Performing upgrade..."
+    upgrade_status=$(qvm-run -p $new_template_name "sudo dnf --releasever=$new_num distro-sync --best --allowerasing -y")
     
     message "Checking for space errors..."
     if [[ $upgrade_status == *"No space left on device"* ]]; then
