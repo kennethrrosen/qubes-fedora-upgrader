@@ -101,3 +101,10 @@ else
     new_template_name=$(get_new_template_name $template)
     upgrade_template $template $proceed $clone $new_template_name
 fi
+
+if [ $# -eq 0 ]; then
+	cat >&2 <<-EOF
+	Usage: ${0##*/} [options] -t 
+	...
+	EOF
+fi
