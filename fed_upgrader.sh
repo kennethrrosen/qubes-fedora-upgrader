@@ -47,13 +47,13 @@ upgrade_template() {
     message "Attaching block to $new_template_name"
     qvm-start $new_template_name
     qvm-block attach $new_template_name dom0:${dev##*/}
-    qvm-run -p $new_template_name "sudo mkfs.ext4 /dev/xvdi"
-    qvm-run -p $new_template_name "sudo mount /dev/xvdi /mnt/removable"
+    qvm-run -p $new_template_name -u root "mkfs.ext4 /dev/xvdi"
+    qvm-run -p $new_template_name -u root "mount /dev/xvdi /mnt/removable"
 
     message "Performing upgrade. Patience..."
-    if qvm-run -p $new_template_name "sudo dnf clean all && sudo dnf --releasever=$new_num distro-sync --best --allowerasing -y";
+    if qvm-run -p $new_template_name -u root "dnf clean all && dnf --releasever=$new_num distro-sync --best --allowerasing -y";
     then
-        qvm-run -p $new_template_name "sudo dnf update -y && sudo dnf upgrade -y"
+        qvm-run -p $new_template_name -u root "dnf update -y && dnf upgrade -y"
         qvm-run -p $new_template_name "cat /etc/fedora-release"
         qvm-shutdown $new_template_name
         sleep 2
