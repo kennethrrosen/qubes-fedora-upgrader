@@ -60,6 +60,7 @@ upgrade_template() {
         message "Removing temporary cache..."
         sudo losetup -d $dev
         rm -f /var/tmp/template-upgrade-cache.img
+	qvm-features $new_template_name template-name $new_template_name
         sleep 2
         message "Upgrade completed successfully!"
     else
