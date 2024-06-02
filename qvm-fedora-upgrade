@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Qubes OS Fedora Template Upgrade Script
-# https://www.kennethrrosen.com
+# https://www.kennethrrosen.cloud
 #
 # Copyright (C) 2024 by Kenneth R. Rosen kennethrrosen@proton.me
 #
@@ -21,16 +21,10 @@
 
 set -o noglob
 
-### Configs
-
-# Colors
 PREFIX="$(tput setaf 7)$(tput bold)"
 YELLOW="$(tput setaf 3)$(tput bold)"
 POSTFIX="$(tput sgr0)"
 
-### End configs
-
-# Synopsis: usage
 usage() {
     cat >&2 <<EOF
 Usage: ${0##*/} [OPTION]... TEMPLATE...
@@ -48,7 +42,6 @@ Examples:
 EOF
 }
 
-# Processing command line options
 while getopts ":h" opt; do
     case ${opt} in
         h )
@@ -69,12 +62,10 @@ while getopts ":h" opt; do
 done
 shift $((OPTIND -1))
 
-# Synopsis: message MESSAGE
 message() {
     echo "${PREFIX}${1}${POSTFIX}"
 }
 
-# Synopsis: upgrade_template TEMPLATE PROCEED CLONE NEW_TEMPLATE_NAME
 upgrade_template() {
     local template=$1
     local proceed=$2
@@ -103,7 +94,6 @@ upgrade_template() {
         new_template_name=$template
     fi
 
-# Additional operations for allocating space, attaching the block device, and performing the upgrade
     message "Allocating additional space..."
     truncate -s 5GB /var/tmp/template-upgrade-cache.img
     local dev=$(sudo losetup -f --show /var/tmp/template-upgrade-cache.img)
@@ -131,7 +121,6 @@ upgrade_template() {
         exit 1
     fi
 
-# Synopsis: prompt_user
 prompt_user() {
     local current_version=$(qvm-run -p "$template" "cat /etc/fedora-release")
     local current_num=$(echo "$current_version" | grep -oP '(\d+)')
@@ -144,7 +133,6 @@ prompt_user() {
     read -p "Do you want to clone the template before upgrading? (y/n): " clone
 }
 
-# Synopsis: get_new_template_name TEMPLATE
 get_new_template_name() {
     if [[ $clone == "y" ]]; then
         read -p "What should be the new template name? " new_template_name
@@ -152,6 +140,19 @@ get_new_template_name() {
     else
         echo $1
     fi
+}
+
+change_qvm_features() {
+    local template=$1
+    local new_template_name=$2
+    local version_number=${new_template_name##*-}
+    local six_months_later=$(date -d "+6 months" +%Y-%m-%d)
+
+    qvm-features $template name $new_template_name
+    qvm-features $template os-version $version_number
+    qvm-features $template template-summary "Qubes template for $new_template_name"
+    qvm-features $template template-description "Qubes template for $new_template_name"
+    qvm-features $template os-eol $six_months_later
 }
 
 main() {
@@ -165,6 +166,7 @@ main() {
         prompt_user
         new_template_name=$(get_new_template_name "$template")
         upgrade_template "$template" "$proceed" "$clone" "$new_template_name"
+        change_qvm_features "$template" "$new_template_name"
     done
 }
 
