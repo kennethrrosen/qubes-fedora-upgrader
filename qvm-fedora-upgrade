@@ -146,13 +146,12 @@ change_qvm_features() {
     local template=$1
     local new_template_name=$2
     local version_number=${new_template_name##*-}
-    local six_months_later=$(date -d "+6 months" +%Y-%m-%d)
 
     qvm-features $template name $new_template_name
     qvm-features $template os-version $version_number
     qvm-features $template template-summary "Qubes template for $new_template_name"
     qvm-features $template template-description "Qubes template for $new_template_name"
-    qvm-features $template os-eol $six_months_later
+    qvm-run -u root --service $new_template_name qubes.PostInstall
 }
 
 main() {
