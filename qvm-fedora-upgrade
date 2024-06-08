@@ -120,17 +120,16 @@ upgrade_template() {
         message "Upgrade failed. Check the template for issues."
         exit 1
     fi
+}
 
 prompt_user() {
-    local current_version=$(qvm-run -p "$template" "cat /etc/fedora-release")
-    local current_num=$(echo "$current_version" | grep -oP '(\d+)')
-    message "Current version of $template is: Fedora release $current_num ${YELLOW}"
+    message "Upgrade Fedora template in QubesOS"
+    read -p "Do you want to clone the template before upgrading? (y/n): " clone
     read -p "Proceed with the upgrade? (y/n): " proceed
     if [[ $proceed != "y" ]]; then
         message "Skipping $template without changes."
         exit 0
     fi
-    read -p "Do you want to clone the template before upgrading? (y/n): " clone
 }
 
 get_new_template_name() {
@@ -147,11 +146,11 @@ change_qvm_features() {
     local new_template_name=$2
     local version_number=${new_template_name##*-}
 
-    qvm-features $template name $new_template_name
-    qvm-features $template os-version $version_number
-    qvm-features $template template-summary "Qubes template for $new_template_name"
-    qvm-features $template template-description "Qubes template for $new_template_name"
-    qvm-run -u root --service $new_template_name qubes.PostInstall
+    qvm-features "$template" name "$new_template_name"
+    qvm-features "$template" os-version "$version_number"
+    qvm-features "$template" template-summary "Qubes template for $new_template_name"
+    qvm-features "$template" template-description "Qubes template for $new_template_name"
+    qvm-run -u root --service "$new_template_name" qubes.PostInstall
 }
 
 main() {
